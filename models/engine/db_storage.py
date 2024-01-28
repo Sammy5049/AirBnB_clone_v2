@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defines DBStorage engine for project."""
+"""Defines the DBStorage engine."""
 from os import getenv
 from models.base_model import Base
 from models.base_model import BaseModel
@@ -16,10 +16,10 @@ from sqlalchemy.orm import sessionmaker
 
 
 class DBStorage:
-    """Represents db storage engine.
+    """Represents a database storage engine.
     Attributes:
-        __engine (sqlalchemy.Engine): working SQLAlchemy engine.
-        __session (sqlalchemy.Session): working SQLAlchemy session.
+        __engine (sqlalchemy.Engine): The working SQLAlchemy engine.
+        __session (sqlalchemy.Session): The working SQLAlchemy session.
     """
 
     __engine = None
@@ -38,8 +38,9 @@ class DBStorage:
 
     def all(self, cls=None):
         """Query on the curret database session all objects of the given class.
+        If cls is None, queries all types of objects.
         Return:
-            Dict of queried classes in format <class name>.<obj id> = obj.
+            Dict of queried classes in the format <class name>.<obj id> = obj.
         """
         if cls is None:
             objs = self.__session.query(State).all()
@@ -59,13 +60,16 @@ class DBStorage:
         self.__session.add(obj)
 
     def save(self):
+        """Commit all changes to the current database session."""
         self.__session.commit()
 
     def delete(self, obj=None):
+        """Delete obj from the current database session."""
         if obj is not None:
             self.__session.delete(obj)
 
     def reload(self):
+        """Create all tables in the database and initialize a new session."""
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
@@ -73,4 +77,5 @@ class DBStorage:
         self.__session = Session()
 
     def close(self):
+        """Close the working SQLAlchemy session."""
         self.__session.close()
